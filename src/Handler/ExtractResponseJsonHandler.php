@@ -16,7 +16,7 @@ use function ZJKiza\HttpResponseValidator\addIdInMessage;
  * @psalm-suppress LessSpecificImplementedReturnType
  * @psalm-suppress MoreSpecificReturnType
  *
- * @implements HandlerInterface<ResponseInterface, array<string,mixed>|object>
+ * @implements HandlerInterface<mixed, array<string,mixed>|object>
  */
 final class ExtractResponseJsonHandler extends AbstractHandler implements HandlerInterface
 {
@@ -25,12 +25,11 @@ final class ExtractResponseJsonHandler extends AbstractHandler implements Handle
     private bool $associative = true;
 
     /**
-     * @param ResponseInterface $value
-     *
-     * @retrun Result<array<string,mixed>|object>
+     * @return Result<array<string,mixed>|object>
      */
     public function __invoke(mixed $value): Result
     {
+        /** @var ResponseInterface $value */
         try {
             /** @var array<string,mixed>|object $data */
             $data = \json_decode($value->getContent(false), $this->associative, 512, JSON_THROW_ON_ERROR);

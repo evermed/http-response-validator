@@ -8,9 +8,7 @@ use ZJKiza\HttpResponseValidator\Validator\ArrayStructureExactValidation;
 use ZJKiza\HttpResponseValidator\Validator\ArrayStructureInternalValidation;
 use ZJKiza\HttpResponseValidator\Validator\Helper\ErrorCollector;
 
-/**
- * @phpstan-ignore-next-line
- */
+/** @psalm-suppress InternalMethod */
 trait ArrayMatchesTrait
 {
     /**
@@ -18,6 +16,8 @@ trait ArrayMatchesTrait
      *
      * @param mixed[] $actual
      * @param mixed[] $expected
+     *
+     * @psalm-suppress InternalMethod
      */
     public function assertArrayStructureAndValues(array $actual, array $expected): void
     {
@@ -30,6 +30,8 @@ trait ArrayMatchesTrait
      *
      * @param mixed[] $actual
      * @param mixed[] $expected
+     *
+     * @psalm-suppress InternalMethod
      */
     public function assertArrayStrictStructureAndValues(array $actual, array $expected): void
     {
@@ -40,6 +42,8 @@ trait ArrayMatchesTrait
     /**
      * @param mixed[] $actual
      * @param mixed[] $expected
+     *
+     * @psalm-suppress InternalMethod
      */
     public function assertArrayStructure(array $actual, array $expected, bool $checkTypes = false, bool $ignoreNulls = true): void
     {
@@ -49,9 +53,7 @@ trait ArrayMatchesTrait
         $errors = $validator->getErrorCollector()->all();
 
         if (true === (bool) $errors) {
-            self::assertEmpty($errors, \implode(\PHP_EOL, $errors));
-
-            return;
+            self::fail(\implode(\PHP_EOL, $errors));
         }
 
         $this->addToAssertionCount(1);
@@ -60,6 +62,8 @@ trait ArrayMatchesTrait
     /**
      * @param mixed[] $actual
      * @param mixed[] $expected
+     *
+     * @psalm-suppress InternalMethod
      */
     public function assertArrayStructureExact(array $actual, array $expected, bool $checkTypes = false, bool $ignoreNulls = true): void
     {
@@ -69,9 +73,7 @@ trait ArrayMatchesTrait
         $errors = $validator->getErrorCollector()->all();
 
         if (true === (bool) $errors) {
-            self::assertEmpty($errors, \implode(\PHP_EOL, $errors));
-
-            return;
+            self::fail(\implode(\PHP_EOL, $errors));
         }
 
         $this->addToAssertionCount(1);

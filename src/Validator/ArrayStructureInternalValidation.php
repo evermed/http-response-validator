@@ -73,6 +73,7 @@ final readonly class ArrayStructureInternalValidation implements ValidationStrat
                 }
             }
 
+            /** @var string $key */
             $this->recursiveDescent->descend(
                 allow: true,
                 data: $data,

@@ -30,6 +30,7 @@ final class HttpResponseValidatorTest extends KernelTestCase
     {
         parent::setUp();
 
+        /** @psalm-suppress PropertyTypeCoercion */
         $this->handlerFactory = $this->getContainer()->get(HandlerFactoryInterface::class);
     }
 
@@ -52,7 +53,7 @@ final class HttpResponseValidatorTest extends KernelTestCase
         ];
 
         $mockResponse = new MockResponse(
-            \json_encode($data),
+            \json_encode($data, JSON_THROW_ON_ERROR),
             [
                 'response_headers' => [
                     'content-type' => 'application/json',
@@ -91,7 +92,7 @@ final class HttpResponseValidatorTest extends KernelTestCase
         ];
 
         $mockResponse = new MockResponse(
-            \json_encode($data),
+            \json_encode($data, JSON_THROW_ON_ERROR),
             [
                 'response_headers' => [
                     'content-type' => 'application/json',
@@ -130,7 +131,7 @@ final class HttpResponseValidatorTest extends KernelTestCase
                     'http_request_failed' => [
                         'method' => 'GET',
                         'url' => 'https://example.com/',
-                        'body' => function ($value): void {
+                        'body' => function (string $value): void {
 
                             $expected = [
                                 'name' => 'Foo',
@@ -151,7 +152,7 @@ final class HttpResponseValidatorTest extends KernelTestCase
                     self::assertThat($message, new RegularExpression($pattern));
                 },
                 'context' => [
-                    'trace' => function ($trace): void {
+                    'trace' => function (mixed $trace): void {
                         $this->assertIsArray($trace);
                     },
                 ],
@@ -193,10 +194,10 @@ final class HttpResponseValidatorTest extends KernelTestCase
             [
                 'level' => 'error',
                 'message' => function (string $message): void {
-                    $pattern = '/^[ZJKiza\\\\HttpResponseValidator\\\\Handler\\\\ExtractResponseJsonHandler\] Message ID=[a-f0-9]+ : PHPUnit\\\\Framework\\\\TestCase::runTest -> \[ExtractResponseJsonHandler\] Syntax error$/';
+                    $pattern = '/^[ZJKiza\\\\HttpResponseValidator\\\\Handler\\\\ExtractResponseJsonHandler\] Message ID=[a-f0-9]+ : PHPUnit\\\\Framework\\\\TestCase::(?:runTest|invokeTestMethod) -> \[ExtractResponseJsonHandler\] Syntax error$/';
                     self::assertThat($message, new RegularExpression($pattern));
                 },
-                'context' => function ($trace): void {
+                'context' => function (mixed $trace): void {
                     $this->assertIsArray($trace);
                 },
 
@@ -228,10 +229,10 @@ final class HttpResponseValidatorTest extends KernelTestCase
             [
                 'level' => 'error',
                 'message' => function (string $message): void {
-                    $pattern = '/^\[ZJKiza\\\\HttpResponseValidator\\\\Handler\\\\ArrayStructureValidateInternalHandler\] Message ID=[a-f0-9]+ :  PHPUnit\\\\Framework\\\\TestCase::runTest -> \[ArrayStructureValidateInternalHandler\] Errors: Missing required key "root\.lorem"\.$/';
+                    $pattern = '/^\[ZJKiza\\\\HttpResponseValidator\\\\Handler\\\\ArrayStructureValidateInternalHandler\] Message ID=[a-f0-9]+ :  PHPUnit\\\\Framework\\\\TestCase::(?:runTest|invokeTestMethod) -> \[ArrayStructureValidateInternalHandler\] Errors: Missing required key "root\.lorem"\.$/';
                     self::assertThat($message, new RegularExpression($pattern));
                 },
-                'context' => function ($trace): void {
+                'context' => function (mixed $trace): void {
                     $this->assertIsArray($trace);
                 },
 
@@ -263,10 +264,10 @@ final class HttpResponseValidatorTest extends KernelTestCase
             [
                 'level' => 'error',
                 'message' => function (string $message): void {
-                    $pattern = '/^\[ZJKiza\\\\HttpResponseValidator\\\\Handler\\\\ArrayStructureValidateInternalHandler\] Message ID=[a-f0-9]+ :  PHPUnit\\\\Framework\\\\TestCase::runTest -> \[ArrayStructureValidateInternalHandler\] Errors: Missing required key "root\.lorem", Missing required key "root\.bar"\.$/';
+                    $pattern = '/^\[ZJKiza\\\\HttpResponseValidator\\\\Handler\\\\ArrayStructureValidateInternalHandler\] Message ID=[a-f0-9]+ :  PHPUnit\\\\Framework\\\\TestCase::(?:runTest|invokeTestMethod) -> \[ArrayStructureValidateInternalHandler\] Errors: Missing required key "root\.lorem", Missing required key "root\.bar"\.$/';
                     self::assertThat($message, new RegularExpression($pattern));
                 },
-                'context' => function ($trace): void {
+                'context' => function (mixed $trace): void {
                     $this->assertIsArray($trace);
                 },
 
@@ -322,10 +323,10 @@ final class HttpResponseValidatorTest extends KernelTestCase
             [
                 'level' => 'error',
                 'message' => function (string $message): void {
-                    $pattern = '/^\[ZJKiza\\\\HttpResponseValidator\\\\Handler\\\\ArrayStructureValidateExactHandler\] Message ID=[a-f0-9]+ ?: +PHPUnit\\\\Framework\\\\TestCase::runTest -> \[ArrayStructureValidateExactHandler\] Errors: Exact key mismatch at \"root\.headers\.bar\"\. Expected: PHPUnit\\\\Framework\\\\TestCase::runTest -> \[\"barKey1\"\], got: PHPUnit\\\\Framework\\\\TestCase::runTest -> \[\"barKey1\",\"barKey2\"\]\.$/';
+                    $pattern = '/^\[ZJKiza\\\\HttpResponseValidator\\\\Handler\\\\ArrayStructureValidateExactHandler\] Message ID=[a-f0-9]+ ?: +PHPUnit\\\\Framework\\\\TestCase::(?:runTest|invokeTestMethod) -> \[ArrayStructureValidateExactHandler\] Errors: Exact key mismatch at \"root\.headers\.bar\"\. Expected: PHPUnit\\\\Framework\\\\TestCase::(?:runTest|invokeTestMethod) -> \[\"barKey1\"\], got: PHPUnit\\\\Framework\\\\TestCase::(?:runTest|invokeTestMethod) -> \[\"barKey1\",\"barKey2\"\]\.$/';
                     self::assertThat($message, new RegularExpression($pattern));
                 },
-                'context' => function ($trace): void {
+                'context' => function (mixed $trace): void {
                     $this->assertIsArray($trace);
                 },
 

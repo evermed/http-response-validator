@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ZJKiza\HttpResponseValidator\Monad;
 
+use ZJKiza\HttpResponseValidator\Contract\HandlerInterface;
+
 /**
  * @psalm-suppress InvalidReturnStatement
  * @psalm-suppress InvalidReturnType
@@ -27,11 +29,13 @@ final class Failure extends Result
     /**
      * @template R
      *
-     * @param callable(T): Result<R> $fn
+     * @param HandlerInterface<mixed, R> $fn
      *
      * @return Result<R>
+     *
+     * @psalm-suppress ImplementedReturnTypeMismatch
      */
-    public function bind(callable $fn): Result
+    public function bind(HandlerInterface $fn): Result
     {
         return $this;
     }

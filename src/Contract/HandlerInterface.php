@@ -8,7 +8,8 @@ use ZJKiza\HttpResponseValidator\Monad\Result;
 
 /**
  * @template TInput
- * @template TOutput
+ *
+ * @template-covariant TOutput
  *
  * @psalm-type HandlerCallable = callable(TInput): Result<TOutput>
  *
@@ -22,6 +23,10 @@ interface HandlerInterface
      * @param TInput $value
      *
      * @return Result<TOutput>
+     *
+     * @psalm-suppress InvalidTemplateParam
+     *
+     * @phpstan-ignore-next-line generics.variance
      */
     public function __invoke(mixed $value): Result/* TOutput */;
 }

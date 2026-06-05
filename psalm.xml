@@ -15,7 +15,6 @@
         <ignoreFiles>
             <directory name="./vendor"/>
             <directory name="./tests/Resources/"/>
-            <directory name="./tests/Functional/"/>
         </ignoreFiles>
     </projectFiles>
 

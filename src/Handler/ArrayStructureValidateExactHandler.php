@@ -15,7 +15,7 @@ use ZJKiza\HttpResponseValidator\Validator\Helper\ErrorCollector;
 use function ZJKiza\HttpResponseValidator\addIdInMessage;
 
 /**
- * @implements HandlerInterface<array<string, mixed>, array<string, mixed>>
+ * @implements HandlerInterface<mixed, array<string, mixed>>
  */
 final class ArrayStructureValidateExactHandler extends AbstractHandler implements HandlerInterface
 {
@@ -28,12 +28,11 @@ final class ArrayStructureValidateExactHandler extends AbstractHandler implement
     private bool $checkTypes = false;
 
     /**
-     * @param array<string, mixed> $value
-     *
      * @return Result<array<string, mixed>>
      */
     public function __invoke(mixed $value): Result
     {
+        /** @var array<string, mixed> $value */
         if (false === (bool) $this->structure) {
             throw new InvalidPropertyValueException('Property structure is not set in ArrayStructureValidateInternalHandler.');
         }

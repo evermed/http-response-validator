@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.2]
+Fixed
+- Resolved all PHPStan (max level) and Psalm static analysis errors across the bundle, enabling clean type-checking for both production and test code.
+
 ## [0.12.1]
 Change/fix 
 - function name from ZJKiza\HttpResponseValidator\PhpUnit\ArrayMatchesTrait::arrayStructureExact to assertArrayStructureExact

@@ -16,6 +16,9 @@ use ZJKiza\HttpResponseValidator\Tests\Resources\KernelTestCase;
 
 final class HttpLoggerComponentsTest extends KernelTestCase
 {
+    /**
+     * @param class-string $expectedClass
+     */
     #[DataProvider('provideExceptionFactoryCases')]
     public function testHttpExceptionFactoryCreate(int $statusCode, string $expectedClass, string $expectedMessagePart): void
     {

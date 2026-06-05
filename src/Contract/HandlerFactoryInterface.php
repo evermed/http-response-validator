@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace ZJKiza\HttpResponseValidator\Contract;
 
-/**
- * @template T of HandlerInterface<mixed, mixed>
- */
 interface HandlerFactoryInterface
 {
     /**
+     * @template T of HandlerInterface
+     *
      * @param class-string<T> $class
      *
      * @return T

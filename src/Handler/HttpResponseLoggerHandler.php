@@ -12,7 +12,7 @@ use ZJKiza\HttpResponseValidator\HttpLogger\HttpResponseLogger;
 use ZJKiza\HttpResponseValidator\Monad\Result;
 
 /**
- * @implements HandlerInterface<ResponseInterface, ResponseInterface|string>
+ * @implements HandlerInterface<mixed, ResponseInterface|string>
  */
 final class HttpResponseLoggerHandler extends AbstractHandler implements HandlerInterface
 {
@@ -31,12 +31,11 @@ final class HttpResponseLoggerHandler extends AbstractHandler implements Handler
     }
 
     /**
-     * @param ResponseInterface $value
-     *
      * @return Result<ResponseInterface|string>
      */
     public function __invoke(mixed $value): Result
     {
+        /** @var ResponseInterface $value */
         try {
 
             if ((bool) $this->sensitiveKeys) {

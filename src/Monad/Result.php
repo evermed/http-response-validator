@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZJKiza\HttpResponseValidator\Monad;
 
+use ZJKiza\HttpResponseValidator\Contract\HandlerInterface;
 use ZJKiza\HttpResponseValidator\Contract\ResultInterface;
 
 /**
@@ -21,11 +22,11 @@ abstract class Result implements ResultInterface
     /**
      * @template R
      *
-     * @param callable(T): Result<R> $fn
+     * @param HandlerInterface<mixed, R> $fn
      *
      * @return Result<R>
      */
-    abstract public function bind(callable $fn): Result;
+    abstract public function bind(HandlerInterface $fn): Result;
 
     /**
      * @return T

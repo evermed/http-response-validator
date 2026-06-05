@@ -8,6 +8,7 @@ use Psr\Log\AbstractLogger;
 
 final class TestLogger extends AbstractLogger
 {
+    /** @var array<mixed> */
     public $records = [];
 
     public function log($level, $message, array $context = []): void

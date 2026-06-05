@@ -15,6 +15,9 @@ final class PhpUnitToolTest extends KernelTestCase
 {
     use ArrayMatchesTrait;
 
+    /**
+     * @param array<array-key, mixed> $actualExpected
+     */
     #[DataProvider('getDataForSuccessfulStrictStrict')]
     public function testSuccessfulStrictStrict(array $actualExpected): void
     {
@@ -79,6 +82,10 @@ final class PhpUnitToolTest extends KernelTestCase
         ];
     }
 
+    /**
+     * @param array<array-key, mixed> $actual
+     * @param array<array-key, mixed> $expected
+     */
     #[DataProvider('getDataForSuccessfulArrayStructureAndValues')]
     public function testSuccessfulArrayStructureAndValues(array $actual, array $expected): void
     {
@@ -186,6 +193,10 @@ final class PhpUnitToolTest extends KernelTestCase
         ];
     }
 
+    /**
+     * @param array<array-key, mixed> $items
+     * @param array<array-key, mixed> $expected
+     */
     #[DataProvider('getDataForSuccessfulArrayStructure')]
     public function testSuccessfulArrayStructure(array $items, array $expected, bool $checkTypes): void
     {
@@ -319,6 +330,10 @@ final class PhpUnitToolTest extends KernelTestCase
         ];
     }
 
+    /**
+     * @param array<array-key, mixed> $items
+     * @param array<array-key, mixed> $expected
+     */
     #[DataProvider('getDataForExpectedErrorsArrayStructure')]
     public function testExpectedErrorsArrayStructure(array $items, array $expected, string $message, bool $checkTypes): void
     {
@@ -370,8 +385,7 @@ final class PhpUnitToolTest extends KernelTestCase
             'Missing required key "root.headers.bar"'.PHP_EOL.
             'Key "root.headers.ad.cc" expects type "string", got "object"'.PHP_EOL.
             'Key "root.headers.ad.ee[2]" expects type "string", got "integer"'.PHP_EOL.
-            'Key "root.headers.ad.ff[1]" expects type "non-empty-string", got "string"'.PHP_EOL.
-            'Failed asserting that an array is empty.',
+            'Key "root.headers.ad.ff[1]" expects type "non-empty-string", got "string"',
             true,
         ];
 
@@ -407,8 +421,7 @@ final class PhpUnitToolTest extends KernelTestCase
             'Key "root.args.test_bool" expects type "bool", got "string"'.PHP_EOL.
             'Key "root.args.test_array" expects type "array", got "string"'.PHP_EOL.
             'Key "root.args.test_object" expects type "object", got "string"'.PHP_EOL.
-            'Key "root.args.test_null" expects type "null", got "string"'.PHP_EOL.
-            'Failed asserting that an array is empty.',
+            'Key "root.args.test_null" expects type "null", got "string"',
             true,
         ];
 
@@ -430,8 +443,7 @@ final class PhpUnitToolTest extends KernelTestCase
                 'numbers' => ExpectedTypes::arrayOf(TypeCheck::FLOAT),
             ],
             'Key "root.args.test" expects type "int|bool|null", got "string"'.PHP_EOL.
-            'Key "root.numbers[2]" expects type "float", got "integer"'.PHP_EOL.
-            'Failed asserting that an array is empty.',
+            'Key "root.numbers[2]" expects type "float", got "integer"',
             true,
         ];
     }

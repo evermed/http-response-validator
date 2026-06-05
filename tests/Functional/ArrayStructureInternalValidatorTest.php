@@ -14,6 +14,10 @@ use ZJKiza\HttpResponseValidator\Validator\Type\ExpectedTypes;
 
 final class ArrayStructureInternalValidatorTest extends KernelTestCase
 {
+    /**
+     * @param array<array-key, mixed> $structure
+     * @param array<array-key, mixed> $data
+     */
     #[DataProvider('provideSuccessfulValidationCases')]
     public function testSuccessful(array $structure, array $data, bool $ignoreNulls, bool $checkTypes): void
     {
@@ -153,6 +157,11 @@ final class ArrayStructureInternalValidatorTest extends KernelTestCase
         ];
     }
 
+    /**
+     * @param array<array-key, mixed> $structure
+     * @param array<array-key, mixed> $data
+     * @param array<int, string>      $expectedErrors
+     */
     #[DataProvider('provideErrorValidationCases')]
     public function testExpectErrors(array $structure, array $data, array $expectedErrors, bool $ignoreNulls, bool $checkTypes): void
     {
@@ -326,6 +335,10 @@ final class ArrayStructureInternalValidatorTest extends KernelTestCase
         );
     }
 
+    /**
+     * @param array<array-key, mixed> $structure
+     * @param array<array-key, mixed> $data
+     */
     #[DataProvider('provideInvalidExpectedTypes')]
     public function testExpectExceptionWithCheckTypesWitchIsCorrect(array $structure, array $data): void
     {

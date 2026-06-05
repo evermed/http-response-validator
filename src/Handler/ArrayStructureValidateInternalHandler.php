@@ -15,25 +15,24 @@ use ZJKiza\HttpResponseValidator\Validator\Helper\ErrorCollector;
 use function ZJKiza\HttpResponseValidator\addIdInMessage;
 
 /**
- * @implements HandlerInterface<array<string, mixed>, array<string, mixed>>
+ * @implements HandlerInterface<mixed, array<string, mixed>>
  */
 final class ArrayStructureValidateInternalHandler extends AbstractHandler implements HandlerInterface
 {
     use TagIndexMethod;
 
-    /** @var array<string, mixed> */
+    /** @var array<array-key, mixed> */
     private array $structure = [];
 
     private bool $ignoreNulls = false;
     private bool $checkTypes = false;
 
     /**
-     * @param array<string, mixed> $value
-     *
      * @return Result<array<string, mixed>>
      */
     public function __invoke(mixed $value): Result
     {
+        /** @var array<string, mixed> $value */
         if (false === (bool) $this->structure) {
             throw new InvalidPropertyValueException('Property structure is not set in ArrayStructureValidateInternalHandler.');
         }
@@ -61,7 +60,7 @@ final class ArrayStructureValidateInternalHandler extends AbstractHandler implem
     }
 
     /**
-     * @param array<string, mixed> $structure
+     * @param array<array-key, mixed> $structure
      */
     public function setKeys(array $structure): self
     {

@@ -9,9 +9,11 @@ use ZJKiza\HttpResponseValidator\Contract\HandlerFactoryInterface;
 use ZJKiza\HttpResponseValidator\Enum\TypeCheck;
 use ZJKiza\HttpResponseValidator\Handler\ArrayStructureValidateExactHandler;
 use ZJKiza\HttpResponseValidator\Handler\ArrayStructureValidateInternalHandler;
+use ZJKiza\HttpResponseValidator\Handler\HttpResponseLoggerHandler;
 use ZJKiza\HttpResponseValidator\Monad\Result;
 use ZJKiza\HttpResponseValidator\PhpUnit\ArrayMatchesTrait;
 use ZJKiza\HttpResponseValidator\PhpUnit\PhpUnitTool;
+use ZJKiza\HttpResponseValidator\Tests\Resources\Handler\ThrowingHandler;
 use ZJKiza\HttpResponseValidator\Tests\Resources\KernelTestCase;
 use ZJKiza\HttpResponseValidator\Validator\ArrayStructureInternalValidation;
 use ZJKiza\HttpResponseValidator\Validator\Helper\ErrorCollector;
@@ -28,6 +30,7 @@ final class CoverageGapsTest extends KernelTestCase
     {
         parent::setUp();
 
+        /** @psalm-suppress PropertyTypeCoercion */
         $this->handlerFactory = $this->getContainer()->get(HandlerFactoryInterface::class);
     }
 
@@ -43,8 +46,11 @@ final class CoverageGapsTest extends KernelTestCase
         $result = Result::failure('initial error');
         \restore_exception_handler();
 
-        $bound = $result->bind(static fn (): Result => Result::success('should not execute'));
+        $bound = $result->bind(
+            $this->handlerFactory->create(HttpResponseLoggerHandler::class)
+        );
 
+        /** @phpstan-ignore-next-line assertSame on same Failure object, phpstan over-resolves R from handler type */
         self::assertSame($result, $bound);
         self::assertSame('initial error', $result->getValue());
         self::assertSame('initial error', $result->getOrThrow());
@@ -166,9 +172,7 @@ final class CoverageGapsTest extends KernelTestCase
     public function testSuccessBindConvertsThrowableToFailure(): void
     {
         $result = Result::success(['id' => 1])
-            ->bind(static function (): Result {
-                throw new \RuntimeException('bind failure');
-            });
+            ->bind(new ThrowingHandler());
         \restore_exception_handler();
 
         $this->expectException(\RuntimeException::class);

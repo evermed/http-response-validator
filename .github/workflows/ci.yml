@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} / Symfony ${{ matrix.symfony }}${{ matrix.dependencies == 'lowest' && ' / lowest' || '' }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Symfony 8 requires PHP >= 8.4, Symfony 5.4 is not run on PHP 8.4+.
+        include:
+          - { php: '8.2', symfony: '5.4', dependencies: highest }
+          - { php: '8.2', symfony: '6.4', dependencies: highest }
+          - { php: '8.2', symfony: '7.4', dependencies: highest }
+          - { php: '8.3', symfony: '5.4', dependencies: highest }
+          - { php: '8.3', symfony: '6.4', dependencies: highest }
+          - { php: '8.3', symfony: '7.4', dependencies: highest }
+          - { php: '8.4', symfony: '6.4', dependencies: highest }
+          - { php: '8.4', symfony: '7.4', dependencies: highest }
+          - { php: '8.4', symfony: '8.1', dependencies: highest }
+          - { php: '8.5', symfony: '7.4', dependencies: highest }
+          - { php: '8.5', symfony: '8.1', dependencies: highest }
+          # Lowest versions of the dependencies allowed by composer.json
+          - { php: '8.2', symfony: '6.4', dependencies: lowest }
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, mbstring, xml
+          coverage: none
+          ini-values: memory_limit=-1
+          tools: composer:v2
+
+      - name: Select Symfony ${{ matrix.symfony }}
+        env:
+          SYMFONY: ${{ matrix.symfony }}
+        run: |
+          # composer-unused does not support symfony/config 5.4 and is not used by the checks below.
+          if [ "$SYMFONY" = "5.4" ]; then
+            composer remove --dev --no-update --no-interaction icanhazstring/composer-unused
+          fi
+          composer require --no-update --no-interaction \
+            "symfony/config:${SYMFONY}.*" \
+            "symfony/dependency-injection:${SYMFONY}.*" \
+            "symfony/http-kernel:${SYMFONY}.*"
+          composer require --dev --no-update --no-interaction \
+            "symfony/framework-bundle:${SYMFONY}.*" \
+            "symfony/http-client:${SYMFONY}.*" \
+            "symfony/property-info:${SYMFONY}.*" \
+            "symfony/yaml:${SYMFONY}.*"
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ matrix.php }}-${{ matrix.symfony }}-${{ matrix.dependencies }}-${{ hashFiles('composer.json') }}
+          restore-keys: |
+            composer-${{ matrix.php }}-${{ matrix.symfony }}-${{ matrix.dependencies }}-
+
+      # composer.lock is not versioned, so dependencies are always resolved for the matrix combination.
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress --with-all-dependencies ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
+
+      # Same checks, in the same order, as `commands` in bin/config.py (used by bin/ci.py); coverage report is skipped.
+      # PHPStan needs the container dumped by PHPUnit, so PHPUnit must run first.
+      - name: PHPUnit
+        run: vendor/bin/phpunit
+
+      - name: PHPStan
+        run: composer run phpstan
+
+      - name: Psalm
+        run: composer run psalm
+
+  quality:
+    name: Code style and composer audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          # Lowest PHP version supported by composer.json, as recommended by PHP CS Fixer.
+          php-version: '8.2'
+          extensions: intl, mbstring, xml
+          coverage: none
+          ini-values: memory_limit=-1
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Validate composer.json and audit dependencies
+        run: |
+          composer validate --strict
+          composer audit
+
+      - name: PHP CS Fixer
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --allow-risky=yes

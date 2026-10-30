@@ -5,3 +5,8 @@ services:
   Psr\Log\LoggerInterface:
       alias: ZJKiza\HttpResponseValidator\Tests\Resources\Logger\TestLogger
       public: true
+
+  # Symfony 5.4 `LoggerPass` always re-points `Psr\Log\LoggerInterface` to `logger`, so `logger` is overridden as well.
+  logger:
+      alias: ZJKiza\HttpResponseValidator\Tests\Resources\Logger\TestLogger
+      public: true

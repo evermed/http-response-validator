@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.3]
+Added
+- Added Symfony 8 support: `symfony/config`, `symfony/dependency-injection` and `symfony/http-kernel` now allow `^8.0`.
+- Added GitHub Actions workflow (`.github/workflows/ci.yml`) that runs PHPUnit, PHPStan and Psalm (the same checks as `bin/ci.py`) on a matrix of PHP 8.2 - 8.5 and Symfony 5.4, 6.4, 7.4 and 8.1, plus one job with the lowest allowed dependencies (`--prefer-lowest`).
+- Added a CI job that validates `composer.json`, runs `composer audit` and checks the code style with PHP CS Fixer.
+- Added `symfony/property-info` to `require-dev`, because the test kernel enables the `property_info` framework option.
+
+Changed
+- Widened development dependency constraints so the test suite can be installed on every supported platform:
+  - `symfony/framework-bundle`, `symfony/yaml` and `symfony/http-client` accept `^5.4 || ^6.4 || ^7.0 || ^8.0` (`framework-bundle` `^7.3`),
+  - `phpunit/phpunit` accepts `^11.5 || ^12.4` (PHPUnit 12 requires PHP 8.3, the bundle supports PHP 8.2),
+  - `phpstan/phpstan` requires at least `^2.1.5` (older versions report a false positive in `Result::success()` on the lowest dependencies).
+- Psalm: `DeprecatedInterface` is reported only as info, because Symfony 8.1 marks `BundleInterface` as deprecated.
+- `bin/run.py --verbose` (and `bin/shutdown.py --verbose`) now stream the `docker-compose` output live; without `--verbose` the output is hidden and printed only when the command fails.
+- `bin/utility/dockerManager.py` now runs `docker-compose` without a shell and detects running containers by exact name.
+
+Fixed
+- Tests on Symfony 5.4: `logger` service is now replaced by the test logger too, because Symfony 5.4 `LoggerPass` always points `Psr\Log\LoggerInterface` to `logger`.
+- `bin/ci.py` now tears down the docker containers when a check fails, and it no longer uses `docker exec -it` without a TTY (e.g. in a CI environment).
+- Docker image: `/composer` (`COMPOSER_HOME`) is now writable by the `app` user, which fixes "Cannot create cache directory /composer/cache/..." when running `composer` inside the container.
+
 ## [0.12.2]
 Fixed
 - Resolved all PHPStan (max level) and Psalm static analysis errors across the bundle, enabling clean type-checking for both production and test code.

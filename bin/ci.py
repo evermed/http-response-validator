@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import time
 from rich.console import Console
 from rich.markdown import Markdown
@@ -24,11 +25,14 @@ def run(verbose: bool) -> None:
 
     result_of_tests = 0
 
+    # `-t` needs a TTY, so interactive flags are used only when the script runs in a terminal.
+    docker_exec_flags = '-it' if sys.stdin.isatty() else ''
+
     for command_name, command in commands.items():
         Console().print('[blue]Running `{}`...[/blue]'.format(command_name), width=120)
 
         output_process = subprocess.run(
-            'docker exec -w {} -it {} sh -c "{}"'.format(container_work_dir, container_php, command),
+            'docker exec -w {} {} {} sh -c "{}"'.format(container_work_dir, docker_exec_flags, container_php, command),
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -45,6 +49,7 @@ def run(verbose: bool) -> None:
         Console().print('[red]ERROR! Not all checks passed, execution time was {} seconds.[/red]'.format(total_time),
                         width=80)
         Console().print(Markdown('***'), width=120)
+        docker_manager.down_container()
         exit(1)
 
     Console().print(Markdown('### SUCCESS! All checks pass, execution time was {} seconds.'.format(total_time)),
